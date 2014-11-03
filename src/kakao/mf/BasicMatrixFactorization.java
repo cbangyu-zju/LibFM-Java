@@ -1,35 +1,20 @@
 package kakao.mf;
 import kakao.data.Data;
+import kakao.data.SparseRow;
 
 import java.util.Random;
 import org.la4j.matrix.Matrix;
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.la4j.matrix.dense.Basic2DMatrix;
+import org.la4j.vector.Vector;
 import org.la4j.vector.dense.BasicVector;
+
 
 public class BasicMatrixFactorization extends MatrixFactorization {
 	
 	// Training data set represented by sparse matrix 
-	private Data trainMatrix;
-	// Indicator of training sparse matrix
-	private Data logitMatrix;
+	private Data trainData;
 	
-	// User factors
-	private Basic2DMatrix userFeatures;
-	// Item factors
-	private Basic2DMatrix itemFeatures;
-	
-	// Vector of a user
-	private BasicVector Ri;
-	// Vector of an item
-	private BasicVector Rj;
-	
-	// Number of users
-	private int userNumber;
-	// Number of items
-	private int itemNumber;
-	
-
 	
 	/*
 	 * Construct LibFM algorithm

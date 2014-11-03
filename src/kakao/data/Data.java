@@ -1,47 +1,39 @@
 package kakao.data;
+import kakao.data.SparseRow;
 
 import org.la4j.matrix.sparse.CRSMatrix;
 import org.la4j.vector.dense.BasicVector;
-import org.la4j.vector.sparse.CompressedVector;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.util.List;
+import java.util.ArrayList;
 
 
 public class Data {
 
 	public CRSMatrix data;
+	public List<SparseRow> sparseData;
 	public BasicVector target;
-	private int numRows;
-	public int numCols;
-	public int numFeature;	// column number (starting from 1)
-	public int numCases;	// row number (starting from 1)
+	public int numRows;	// num of rows
+	public int numCols;	 // num of columns 
 	public double minTarget;
 	public double maxTarget;
 
 	public Data() {
 		this.data = null;
+		this.target = null;
+		this.numRows = 0;
+		this.numCols = 0;
+		this.minTarget = Double.MAX_VALUE;
+		this.maxTarget = -Double.MAX_VALUE;
 	}
 	
-	private boolean isDouble(String str) {
-		try {
-			Double.parseDouble(str);
-			return true;
-		} catch (NumberFormatException e) {
-			return false;
-		}
-	}
 	
 	public void load(String filename) throws IOException {
-		this.data = new CRSMatrix();
-		this.target = new BasicVector();
-		this.numRows = 0;
+		int numFeature = 0;
 		int numValues = 0;
-		this.numFeature = 0;
-		boolean has_feature = false;
-		this.minTarget = Float.MAX_VALUE;
-		this.maxTarget = -Float.MAX_VALUE;
 		
 		// (1) Determine the number of rows and the maximum feature_id
 		try {
@@ -50,7 +42,7 @@ public class Data {
 			String line, curr;
 			String[] pair;
 			int currFeatureId;
-			double currTarget, currFeatureValue;
+			double currTarget;
 			while ((line = fData.readLine()) != null) {
                 numRows++;
 				st = new StringTokenizer(line);
@@ -67,14 +59,10 @@ public class Data {
 						numValues++;
 						pair = curr.split(":");
 						currFeatureId = Integer.parseInt(pair[0]);
-						currFeatureValue = Double.parseDouble(pair[1]);
-
 						numFeature = Math.max(currFeatureId, numFeature);
-						data.set(numRows, currFeatureId, currFeatureValue);
-						/* debug */
-						System.out.println("numFeature=" + numFeature + "\tcurrFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
-						/*/debug */
-						has_feature = true;
+						// debug
+						System.out.println("currFeatureId=" + currFeatureId + "\tnumFeature=" + numFeature + "\tnumValues=" + numValues);
+						// /debug
 					}
 				}
 			}
@@ -82,9 +70,11 @@ public class Data {
 		} catch (IOException e) {
 			System.out.println("unable to open " + filename);
 		}
-
-		if (has_feature) { numFeature++; }	
-		// number of feature is bigger (by one) than the largest value
+		
+		this.numCols = numFeature;
+		this.data = new CRSMatrix(numRows+1, numCols+1);
+		this.target = new BasicVector(numRows+1);
+		sparseData = new ArrayList<SparseRow>(numValues);
 		
 		// (2) Read the data
 		try {
@@ -94,37 +84,28 @@ public class Data {
 			String[] pair;
 			int currFeatureId;
 			double currTarget, currFeatureValue;
+			int rowId = 0;
 			while ((line = fData.readLine()) != null) {
-                numRows++;
+                rowId++;
 				st = new StringTokenizer(line);
+                sparseData.set(rowId, new SparseRow());
 				while (st.hasMoreTokens()) {
 					curr = st.nextToken();
 					if (isDouble(curr)) {
 						currTarget = Double.parseDouble(curr);
-						minTarget = Math.min(currTarget, minTarget);
-						maxTarget = Math.max(currTarget, maxTarget);
-						System.out.println("num_rows=" + numRows + "\tcurrTarget=" + currTarget + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
-/*
-						while (target.length() <= numRows) {
-							target.add(0.0);
-							System.out.println(target.length());
-						}
-						*/
-						target.set(numRows, currTarget);
+						target.set(rowId, currTarget);
 						// debug
+						System.out.println("rowId=" + rowId + "\tcurrTarget=" + currTarget);
 						// /debug
 					} else if (curr.matches("\\d+:\\d+")) {
-						numValues++;
 						pair = curr.split(":");
 						currFeatureId = Integer.parseInt(pair[0]);
 						currFeatureValue = Double.parseDouble(pair[1]);
-
-						numFeature = Math.max(currFeatureId, numFeature);
-						data.set(numRows, currFeatureId, currFeatureValue);
-						/* debug */
-						System.out.println("numFeature=" + numFeature + "\tcurrFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
-						/*/debug */
-						has_feature = true;
+						sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
+						data.set(rowId, currFeatureId, currFeatureValue);
+						// debug
+						System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
+						// /debug
 					}
 				}
 			}
@@ -133,9 +114,16 @@ public class Data {
 			System.out.println("unable to open " + filename);
 		}
 
-		if (has_feature) { numFeature++; }	
-		// number of feature is bigger (by one) than the largest value
-		System.out.println("numRows=" + numRows + "\tnumValues=" + numValues + "\tnumFeatures=" + numFeature + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
+		System.out.println("numRows=" + numRows + "\tnumCols=" + numCols + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
 
+	}
+
+	private boolean isDouble(String str) {
+		try {
+			Double.parseDouble(str);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }
