@@ -11,42 +11,44 @@ public class Cmdline {
 	public String delimiter;
 	
 	public Cmdline(int argc, String[] argv) throws Exception {
+		help = new HashMap<String, String>();
+		value = new HashMap<String, String>();
 		delimiter = ";,";
-		int i = 1;
+		int i = 0;
 		while (i < argc) {
 			String s = argv[i];
-			if (parse_name(s)) {
-				if (value.containsKey(s)) {
-					throw new Exception("the parameter " + s + " is already specified");
-				}
-				if ((i+1) < argc) {
-					String s_next = argv[i+1];
-					if (!parse_name(s_next)) {
-						value.put(s, s_next);
-						i++;
+				if (parse_name(s).length() > 0) {
+					s = parse_name(s);
+					if (value.containsKey(s)) {
+						throw new Exception("the parameter " + s + " is already specified");
+					}
+					if ((i+1) < argc) {
+						String s_next = argv[i+1];
+						if (!(parse_name(s_next).length() > 0)) {
+							value.put(s, s_next);
+							i++;
+						} else {
+							value.put(s, "");
+						}
 					} else {
 						value.put(s, "");
 					}
 				} else {
-					value.put(s, "");
+					throw new Exception("cannot parse " + s);
 				}
-			} else {
-				throw new Exception("cannot parse " + s);
-			}
-			i++;
+				i++;
 		}
 	}
 	
-	protected boolean parse_name(String s) {
+	protected String parse_name(String s) {
 		if ((s.length() > 0) && (s.charAt(0) == '-')) {
 			if ((s.length() > 1) && (s.charAt(1) == '-')) {
-				s = s.substring(2);
+				return s.substring(2);
 			} else {
-				s = s.substring(1);
+				return s.substring(1);
 			}
-			return true;
 		} else {
-			return false;
+			return "";
 		}
 	}
 	
@@ -88,8 +90,8 @@ public class Cmdline {
 	
 	public void checkParameters() throws Exception {
 		// make sure there is no parameter specified on the cmdline that is not registered:
-		for (String key : help.keySet()) {
-			if (value.containsKey(key)) {
+		for (String key : value.keySet()) {
+			if (!help.containsKey(key)) {
 				throw new Exception("the parameter " + key + " does not exist");
 			}
 		}
@@ -125,6 +127,7 @@ public class Cmdline {
 	
 	public ArrayList<String> getStrValues(String parameter) {
 		ArrayList<String> result = new ArrayList<String>();
+		System.out.println(value.get(parameter));
 		StringTokenizer tokens = new StringTokenizer(value.get(parameter), delimiter);
 		while (tokens.hasMoreTokens()) {
 			result.add(tokens.nextToken());
@@ -132,26 +135,25 @@ public class Cmdline {
 		return result;
 	}
 	
-	// public ArrayList<Integer> getIntValues(String parameter) {}
+	public ArrayList<Integer> getIntValues(String parameter) {
+		ArrayList<Integer> result;
+		ArrayList<String> result_str = getStrValues(parameter);
+		result = new ArrayList<Integer>(result_str.size());
+		for (int i = 0; i < result.size(); i++) {
+			result.set(i, Integer.parseInt(result_str.get(i)));
+		}
+		return result;
+	}
 
-	// public ArrayList<Double> getDblValues(String parameter) {}
+	public ArrayList<Double> getDblValues(String parameter) {
+		ArrayList<Double> result;
+		ArrayList<String> result_str = getStrValues(parameter);
+		result = new ArrayList<Double>(result_str.size());
+		for (int i = 0; i < result.size(); i++) {
+			result.set(i, Double.parseDouble(result_str.get(i)));
+		}
+		return result;
+	}
+
 
 } /* Kilho has finished it */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

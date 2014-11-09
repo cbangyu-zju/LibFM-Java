@@ -13,7 +13,12 @@ import java.util.ArrayList;
 
 public class Data {
 
+	protected int cache_size;
+	protected boolean has_xt;
+	protected boolean has_x;
+	
 	public CRSMatrix data;
+	public CRSMatrix data_t;
 	public List<SparseRow> sparseData;
 	public BasicVector target;
 	public int numRows;	// num of rows
@@ -21,8 +26,13 @@ public class Data {
 	public double minTarget;
 	public double maxTarget;
 
-	public Data() {
+	public Data(int cache_size, boolean has_x, boolean has_xt) {
 		this.data = null;
+		this.data_t = null;
+		this.sparseData = null;
+		this.cache_size = cache_size;
+		this.has_x = has_x;
+		this.has_xt = has_xt;
 		this.target = null;
 		this.numRows = 0;
 		this.numCols = 0;
@@ -32,6 +42,8 @@ public class Data {
 	
 	
 	public void load(String filename) throws IOException {
+		System.out.println("has x = " + has_x);
+		System.out.println("has xt = " + has_xt);
 		int numFeature = 0;
 		int numValues = 0;
 		
@@ -53,7 +65,7 @@ public class Data {
 						minTarget = Math.min(currTarget, minTarget);
 						maxTarget = Math.max(currTarget, maxTarget);
 						// debug
-						System.out.println("num_rows=" + numRows + "\tcurrTarget=" + currTarget + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
+						System.out.println("numRows=" + numRows + "\tcurrTarget=" + currTarget + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
 						// /debug
 					} else if (curr.matches("\\d+:\\d+")) {
 						numValues++;
@@ -74,7 +86,9 @@ public class Data {
 		this.numCols = numFeature;
 		this.data = new CRSMatrix(numRows+1, numCols+1);
 		this.target = new BasicVector(numRows+1);
-		sparseData = new ArrayList<SparseRow>(numValues);
+		sparseData = new ArrayList<SparseRow>(numRows+1);
+		for (int i = 0; i <= numRows+1; i++) { sparseData.add(null); }
+
 		
 		// (2) Read the data
 		try {

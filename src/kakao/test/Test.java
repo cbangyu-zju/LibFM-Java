@@ -7,6 +7,10 @@ import kakao.algorithm.FM_Learn;
 import kakao.algorithm.FM_Learn_Sgd_Element;
 import kakao.util.Cmdline;
 
+import org.la4j.vector.dense.BasicVector;
+import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class Test {
@@ -66,8 +70,11 @@ public class Test {
 			if (!cmdline.hasParameter(param_dim)) {
 				cmdline.setValue(param_dim, "1,1,8");
 			}
+			if (!cmdline.hasParameter(param_regular)) {
+				cmdline.setValue(param_regular, "0");
+			}
 			
-			if (!cmdline.getValue(param_method).equals("als")) {
+			if (cmdline.getValue(param_method).equals("als")) {
 			// als is an mcmc without sampling and hyperparameter inference
 				cmdline.setValue(param_method, "mcmc");
 				if (!cmdline.hasParameter(param_do_sampling)) {
@@ -80,12 +87,45 @@ public class Test {
 
                 // (1) Load the data
                 System.out.println("Loading train...");
-                Data trainData = new Data();
-                trainData.load("train.libsvm");
+                System.out.println(cmdline.getValue(param_train_file));
+                Data trainData = 
+                	new Data(cmdline.getValue(param_cache_size, 0),
+            		!cmdline.getValue(param_method).equals("mcmc"),
+            		// no original data for mcmc
+            		!(cmdline.getValue(param_method).equals("sgd") || 
+            		cmdline.getValue(param_method).equals("sgda")));	
+                	// no transpose data for sgd, sgda
+                trainData.load(cmdline.getValue(param_train_file));
                 System.out.println("Loading test...");
-                Data testData = new Data();
-                testData.load("test.libsvm");
+                Data testData =
+                	new Data(cmdline.getValue(param_cache_size, 0),
+            		!cmdline.getValue(param_method).equals("mcmc"),
+            		// no original data for mcmc
+            		!(cmdline.getValue(param_method).equals("sgd") || 
+            		cmdline.getValue(param_method).equals("sgda")));	
+                	// no transpose data for sgd, sgda
+                testData.load(cmdline.getValue(param_train_file));
                 
+                Data validationData = null;
+                if (cmdline.hasParameter(param_val_file)) {
+                	if (!cmdline.getValue(param_method).equals("sgda")) {
+                		System.out.println("WARNING: Validation data is only used for SGDA. The data is ignored.");
+                	} else {
+                		System.out.println("Loading validation set...");
+                		validationData =
+                		new Data(cmdline.getValue(param_cache_size, 0),
+                		!cmdline.getValue(param_method).equals("mcmc"),
+                		// no original data for mcmc
+                		!(cmdline.getValue(param_method).equals("sgd") || 
+                		cmdline.getValue(param_method).equals("sgda")));	
+                	// no transpose data for sgd, sgda
+            		validationData.load(cmdline.getValue(param_val_file));
+                	}
+                }
+                
+                // TODO: (1.1.1) Load relational data
+                BasicVector relation;
+
                 // (1.2) Load meta data
                 System.out.println("Loading meta data...");
                 int numAllAttr = Math.max(trainData.numCols,testData.numCols);
@@ -93,9 +133,11 @@ public class Test {
                 metaMain.loadGroupsFromFile("meta.txt");
                 DataMetaInfo meta = metaMain;	// TODO: don't consider relation at this time
                 
-                // build the joined meta table
+                // TODO: build the joined meta table
                 
+
                 // (2) Setup the factorization machine
+                System.out.println("Setting up the factorization machine...");
                 FM_Model fm = new FM_Model();
                 fm.numAttr = numAllAttr;
                 fm.initStdev = 0.01;	// set the number of dimensions in the factorization
@@ -105,46 +147,98 @@ public class Test {
                 fm.numFactor = Integer.parseInt(dim[2]);
                 fm.init();
                 
+
                 // (3) Setup the learning method
-                FM_Learn_Sgd fml = new FM_Learn_Sgd_Element();
-                fml.numIter = 100;
-                // fml.validation = validation;
+                System.out.println("Setting up the learning method...");
+                FM_Learn fml;
+                //if (cmdline.getValue(param_method).equals("sgd")) {
+                	fml = new FM_Learn_Sgd_Element();
+                	((FM_Learn_Sgd)fml).numIter = cmdline.getValue(param_num_iter, 100);
+                //} else if (cmdline.getValue(param_method).equals("sgda")) {
+                	// fml = new FM_Learn_Sgd_Element_Adapt_Reg();
+                	// ((FM_Learn_Sgd)fml).numIter = cmdline.getValue(param_num_iter, 100);
+                	// ((FM_Learn_Sgd_Element_Adapt_Reg)fml).validation = validation;
+                //} else if (cmdline.getValue(param_method).equals("mcmc")) {
+                	// TODO: implement MCMC algorithm
+                	// fml = new FM_Learn_Mcmc_Simultaneous();
+                	// fml.validation = validation;
+                	// fm.w_init_normal(fm.init_mean, fm.init_stdev);
+				//} else {
+					//System.out.println("unknown method");
+                //}
                 fml.fm = fm;
                 fml.maxTarget = trainData.maxTarget;
                 fml.minTarget = trainData.minTarget;
                 fml.meta = meta;
 
-                fml.task = 1;	// set as classification problem at this time
-                for (int i = 1; i < trainData.numRows; i++) {
-                        if (trainData.target.get(i) <= 0.0) {
+                if (cmdline.getValue("task").equals("r")) {
+                	fml.task = 0;
+                } else if (cmdline.getValue("task").equals("c")) {
+                	fml.task = 1;	
+                	for (int i = 1; i < trainData.numRows; i++) {
+                		if (trainData.target.get(i) <= 0.0) {
                                 trainData.target.set(i, -1.0);
                         } else {
                                 trainData.target.set(i, 1.0);
                         }
-                }
-                for (int i = 1; i < trainData.numRows; i++) {
+                	}
+                	for (int i = 1; i < testData.numRows; i++) {
                         if (testData.target.get(i) <= 0.0) {
                                 testData.target.set(i, -1.0);
                         } else {
                                 testData.target.set(i, 1.0);
                         }
+                	}
+                	// if (validation != NULL)
+                } else {
+                	System.out.println("unknown task");
                 }
 
-                // validation
 
                 // (4) Init the logging
+                fml.init(); 
+                if (cmdline.getValue(param_method).equals("mcmc")) {
+                } else {
+                	// set the regularization; for standard SGD, groups are not supported
+                	ArrayList<Double> reg = cmdline.getDblValues(param_regular);
+                	if (reg.size() == 0) {
+                		fm.reg0 = 0.0;
+                		fm.regw = 0.0;
+                		fm.regv = 0.0;
+                	} else if (reg.size() == 1) {
+                		fm.reg0 = reg.get(0);
+                		fm.regw = reg.get(0);
+                		fm.regv = reg.get(0);
+                	} else {
+                		fm.reg0 = reg.get(0);
+                		fm.regw = reg.get(1);
+                		fm.regv = reg.get(2);
+                	}
+                }
+                	
+                // TODO: set the learning rates (individual per layer)
+                	
+                // () learn
+                fml.learn(trainData, testData);
                 
+                // () Prediction at the end (not for mcmc and als)
+                if (cmdline.getValue(param_method).equals("mcmc")) {
+                	System.out.println("Final\t Train=" + fml.evaluate(trainData) + "\tTest=" + fml.evaluate(testData));
+                }
                 
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                // () Save prediction
+                if (cmdline.hasParameter(param_out)) {
+                	BasicVector pred;
+                	pred = new BasicVector(testData.numRows+1);
+                	fml.predict(testData, pred);
+                	
+                	BufferedWriter fData = new BufferedWriter(new FileWriter(cmdline.getValue(param_out)));
+                	for (int i = 1; i < pred.length(); i++) {
+                		fData.write(Double.toString(pred.get(i)));
+                		fData.newLine();
+                	}
+                	fData.close();
+                }
                 
                 /*
                 BasicVector vector = new BasicVector(6);
@@ -206,7 +300,7 @@ public class Test {
         
 		
 		} catch (Exception e) {
-			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 		
 		

@@ -44,6 +44,13 @@ public class FM_Model {
 		mSumSqr = new BasicVector(numFactor+1);
 	}
 	
+	public void w_init_normal(double mean, double stdev) {
+		Random rand = new Random();
+		for (int i_2 = 1; i_2 <= numFactor; i_2++) {
+			w.set(i_2, rand.nextGaussian()*stdev + mean);
+		}
+	}
+	
 	public double predict(SparseRow x) {
 		return predict(x, mSum, mSumSqr);
 	}

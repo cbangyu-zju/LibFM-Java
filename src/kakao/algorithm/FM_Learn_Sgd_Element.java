@@ -22,7 +22,7 @@ public class FM_Learn_Sgd_Element extends FM_Learn_Sgd {
 	public double learnRate;
 	public BasicVector learnRates;
 	*/
-	
+
 	@Override
 	public void init() {
 		super.init();
@@ -37,22 +37,22 @@ public class FM_Learn_Sgd_Element extends FM_Learn_Sgd {
 		// SGD
 		for (int i = 0; i < numIter; i++) {
 			long iterTime = new Date().getTime();
-			for (i = 1; i <= train.numRows; i++) {
-				double p = fm.predict(train.sparseData.get(i), sum, sumSqr);
+			for (int j = 1; j <= train.numRows; j++) {
+				double p = fm.predict(train.sparseData.get(j), sum, sumSqr);
 				double mult = 0;
 				if (task == 0) {
 					p = Math.min(maxTarget,p);
 					p = Math.max(minTarget,p);
-					mult = -(train.target.get(i) - p);
+					mult = -(train.target.get(j) - p);
 				} else if (task == 1) {
-					mult = -train.target.get(i)*(1.0 - 1.0/(1.0+Math.exp(-train.target.get(i)*p)));
+					mult = -train.target.get(j)*(1.0 - 1.0/(1.0+Math.exp(-train.target.get(j)*p)));
 				}
-				SGD(train.sparseData.get(i), mult, sum);
+				SGD(train.sparseData.get(j), mult, sum);
 			}
 			iterTime = new Date().getTime() - iterTime;		// time difference (in ms)
 			double rmse_train = evaluate(train);
 			double rmse_test = evaluate(test);
-			System.out.println("#iter=" + i + "\tTrain=" + rmse_train + "\tTest=" + rmse_test);
+			System.out.println("#iter=" + (i+1) + "\tTrain=" + rmse_train + "\tTest=" + rmse_test);
 		}
 	}
 }
