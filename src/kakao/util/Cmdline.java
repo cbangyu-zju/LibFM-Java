@@ -4,6 +4,8 @@ import java.util.HashMap; // similar to map in C++
 import java.util.ArrayList;	// similar to vector in C++
 import java.util.StringTokenizer;
 
+import kakao.data.SparseRow;
+
 public class Cmdline {
 
 	protected HashMap<String, String> help;
@@ -127,7 +129,6 @@ public class Cmdline {
 	
 	public ArrayList<String> getStrValues(String parameter) {
 		ArrayList<String> result = new ArrayList<String>();
-		System.out.println(value.get(parameter));
 		StringTokenizer tokens = new StringTokenizer(value.get(parameter), delimiter);
 		while (tokens.hasMoreTokens()) {
 			result.add(tokens.nextToken());
@@ -139,6 +140,7 @@ public class Cmdline {
 		ArrayList<Integer> result;
 		ArrayList<String> result_str = getStrValues(parameter);
 		result = new ArrayList<Integer>(result_str.size());
+		for (int i = 0; i < result_str.size() ; i++) { result.add(0); }
 		for (int i = 0; i < result.size(); i++) {
 			result.set(i, Integer.parseInt(result_str.get(i)));
 		}
@@ -149,6 +151,7 @@ public class Cmdline {
 		ArrayList<Double> result;
 		ArrayList<String> result_str = getStrValues(parameter);
 		result = new ArrayList<Double>(result_str.size());
+		for (int i = 0; i < result_str.size() ; i++) { result.add(0.0); }
 		for (int i = 0; i < result.size(); i++) {
 			result.set(i, Double.parseDouble(result_str.get(i)));
 		}

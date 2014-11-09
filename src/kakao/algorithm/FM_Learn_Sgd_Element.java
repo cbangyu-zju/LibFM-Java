@@ -52,7 +52,7 @@ public class FM_Learn_Sgd_Element extends FM_Learn_Sgd {
 			iterTime = new Date().getTime() - iterTime;		// time difference (in ms)
 			double rmse_train = evaluate(train);
 			double rmse_test = evaluate(test);
-			System.out.println("#iter=" + (i+1) + "\tTrain=" + rmse_train + "\tTest=" + rmse_test);
+			System.out.println("#iter=" + i + "\tTrain=" + rmse_train + "\tTest=" + rmse_test);
 		}
 	}
 }

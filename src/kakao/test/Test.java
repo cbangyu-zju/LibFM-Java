@@ -104,7 +104,7 @@ public class Test {
             		!(cmdline.getValue(param_method).equals("sgd") || 
             		cmdline.getValue(param_method).equals("sgda")));	
                 	// no transpose data for sgd, sgda
-                testData.load(cmdline.getValue(param_train_file));
+                testData.load(cmdline.getValue(param_test_file));
                 
                 Data validationData = null;
                 if (cmdline.hasParameter(param_val_file)) {
@@ -128,9 +128,13 @@ public class Test {
 
                 // (1.2) Load meta data
                 System.out.println("Loading meta data...");
+                // (main table)
                 int numAllAttr = Math.max(trainData.numCols,testData.numCols);
+                // if (validation != null) {}
                 DataMetaInfo metaMain = new DataMetaInfo(numAllAttr);
-                metaMain.loadGroupsFromFile("meta.txt");
+                if (cmdline.hasParameter(param_meta_file)) {
+                	metaMain.loadGroupsFromFile(cmdline.getValue(param_meta_file));
+                }
                 DataMetaInfo meta = metaMain;	// TODO: don't consider relation at this time
                 
                 // TODO: build the joined meta table
@@ -140,11 +144,13 @@ public class Test {
                 System.out.println("Setting up the factorization machine...");
                 FM_Model fm = new FM_Model();
                 fm.numAttr = numAllAttr;
-                fm.initStdev = 0.01;	// set the number of dimensions in the factorization
-                String[] dim = "1,1,8".split(",");
-                fm.k0 = (Integer.parseInt(dim[0]) != 0);
-                fm.k1 = (Integer.parseInt(dim[1]) != 0);
-                fm.numFactor = Integer.parseInt(dim[2]);
+                fm.initStdev = cmdline.getValue(param_init_stdev,0.1);
+                // set the number of dimensions in the factorization
+                ArrayList<Integer> dim = cmdline.getIntValues(param_dim);
+                // String[] dim = "1,1,8".split(",");
+                fm.k0 = (dim.get(0) != 0);
+                fm.k1 = (dim.get(1) != 0);
+                fm.numFactor = dim.get(2);
                 fm.init();
                 
 
@@ -216,13 +222,30 @@ public class Test {
                 	}
                 }
                 	
-                // TODO: set the learning rates (individual per layer)
+                // set the learning rates (individual per layer)
+                FM_Learn_Sgd fmlsgd = (FM_Learn_Sgd)fml;
+                ArrayList<Double> lr = cmdline.getDblValues(param_learn_rate);
+                if (lr.size() == 1) {
+                	fmlsgd.learnRate = lr.get(0);
+                	fmlsgd.learnRates = new BasicVector(3);
+                	for (int i = 0; i < fmlsgd.learnRates.length(); i++) {
+                		fmlsgd.learnRates.set(i,lr.get(0));
+                	}
+                } else if (lr.size() == 3) {
+                	fmlsgd.learnRate = 0;
+                	fmlsgd.learnRates = new BasicVector(3);
+                	fmlsgd.learnRates.set(0,lr.get(0));
+                	fmlsgd.learnRates.set(1,lr.get(1));
+                	fmlsgd.learnRates.set(2,lr.get(2));
+                } else {
+                	throw new Exception("learning rates error: its size must be 1 or 3");
+                }
                 	
                 // () learn
                 fml.learn(trainData, testData);
                 
                 // () Prediction at the end (not for mcmc and als)
-                if (cmdline.getValue(param_method).equals("mcmc")) {
+                if (!cmdline.getValue(param_method).equals("mcmc")) {
                 	System.out.println("Final\t Train=" + fml.evaluate(trainData) + "\tTest=" + fml.evaluate(testData));
                 }
                 
@@ -240,65 +263,6 @@ public class Test {
                 	fData.close();
                 }
                 
-                /*
-                BasicVector vector = new BasicVector(6);
-                
-                vector.set(1, 3);
-                vector.set(2, 2);
-                vector.set(3, 1);
-                vector.set(4, 4);
-                vector.set(5, 5);
-                //vector.set(5, 6);
-                
-                for (int i = 0; i < vector.length(); i++) {
-                        System.out.println(vector.get(i));
-                }
-                System.out.println("");
-                
-                vector = (BasicVector)vector.resize(3);
-
-                for (int i = 0; i < vector.length(); i++) {
-                        System.out.println(vector.get(i));
-                }
-                System.out.println("");
-                
-                
-                vector = (BasicVector)vector.resize(7);
-
-                for (int i = 0; i < vector.length(); i++) {
-                        System.out.println(vector.get(i));
-                }
-                */
-
-                /*
-                Data test = new Data();
-                
-
-                try {
-                        test.load("test.libsvm");
-                        System.out.println("\nData:");
-                        for (int i = 1; i <= test.numRows; i++) {
-                                for (int j = 1; j <= test.numCols; j++) {
-                                        double currFeatureValue = test.data.get(i,j);
-                                        if (currFeatureValue > 0) {
-                                                System.out.print("(" + j + "," + currFeatureValue + ")");
-                                        }
-                                }
-                                System.out.print("\n");
-                        }
-                        
-                        System.out.println("\nTarget:");
-                        System.out.print("(");
-                        for (int i = 1; i < test.numRows; i++) {
-                                System.out.print(test.target.get(i) + ",");
-                        }
-                        System.out.print(")");
-                } catch (IOException e) {
-                        System.out.println(e);
-                }
-                */
-        
-		
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

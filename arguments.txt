@@ -1,0 +1,1 @@
+-method sgd -learn_rate 0.1 -task r -train train.libsvm -test test.libsvm -out output.txt -meta meta.txt

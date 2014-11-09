@@ -67,11 +67,12 @@ public class FM_Learn {
 	}
 	
 	protected double evaluate_regression(Data data) {
-		double rmse_sumSqr = 0;
-		double mae_sumAbs = 0;
+		double rmse_sumSqr = 0.0;
+		double mae_sumAbs = 0.0;
 		long evalTime = new Date().getTime();
 		for (int i = 1; i <= data.numRows; i++) {
 			double p = predict_case(data,i);
+			//System.out.println(i+"th p="+p);
 			p = Math.min(maxTarget, p);
 			p = Math.max(minTarget, p);
 			double err = p - data.target.get(i);
@@ -79,7 +80,7 @@ public class FM_Learn {
 			mae_sumAbs += Math.abs(err);
 		}
 		evalTime = (new Date().getTime()) - evalTime;	// time difference (in ms)
-		
+
 		return (double)Math.sqrt(rmse_sumSqr/data.numRows);
 	}
 	

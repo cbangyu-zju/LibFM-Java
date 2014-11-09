@@ -65,7 +65,7 @@ public class Data {
 						minTarget = Math.min(currTarget, minTarget);
 						maxTarget = Math.max(currTarget, maxTarget);
 						// debug
-						System.out.println("numRows=" + numRows + "\tcurrTarget=" + currTarget + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
+						// System.out.println("numRows=" + numRows + "\tcurrTarget=" + currTarget + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
 						// /debug
 					} else if (curr.matches("\\d+:\\d+")) {
 						numValues++;
@@ -73,7 +73,7 @@ public class Data {
 						currFeatureId = Integer.parseInt(pair[0]);
 						numFeature = Math.max(currFeatureId, numFeature);
 						// debug
-						System.out.println("currFeatureId=" + currFeatureId + "\tnumFeature=" + numFeature + "\tnumValues=" + numValues);
+						// System.out.println("currFeatureId=" + currFeatureId + "\tnumFeature=" + numFeature + "\tnumValues=" + numValues);
 						// /debug
 					}
 				}
@@ -109,7 +109,7 @@ public class Data {
 						currTarget = Double.parseDouble(curr);
 						target.set(rowId, currTarget);
 						// debug
-						System.out.println("rowId=" + rowId + "\tcurrTarget=" + currTarget);
+						// System.out.println("rowId=" + rowId + "\tcurrTarget=" + currTarget);
 						// /debug
 					} else if (curr.matches("\\d+:\\d+")) {
 						pair = curr.split(":");
@@ -118,7 +118,7 @@ public class Data {
 						sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
 						data.set(rowId, currFeatureId, currFeatureValue);
 						// debug
-						System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
+						// System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
 						// /debug
 					}
 				}
