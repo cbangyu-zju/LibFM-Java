@@ -12,10 +12,12 @@ import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.Date;
+
 
 public class Test {
-	public static void main(String[] args) throws IOException {
-		try {
+	public static void main(String[] args) throws IOException { try {
+			long execTime = new Date().getTime();
 			int argc = args.length;
 			Cmdline cmdline = new Cmdline(argc, args);
 			System.out.println("----------------------------------------------------------------------------");
@@ -37,7 +39,9 @@ public class Test {
 			String param_out = cmdline.registerParameter("out", "filename for output");
 
 			String param_dim = cmdline.registerParameter("dim","'k0,k1,k2': k0=use bias, k1= use 1-way interactions, k2=dim of 2-way interactions; default=1,1,8");
-			String param_regular = cmdline.registerParameter("regular","'r0,r1,r2' for SGD and ALS: r0=bias regularization, r1=1-way regularization, r2=2-way regularization");
+			// FIXME: fixed regularization parameter input part
+			String param_regular = cmdline.registerParameter("regular","'r0,r1,r2,r3' for SGD and ALS: r0=bias regularization, r1=1-way regularization, r2=2-way regularization, r3=user cluster regularization");
+			// /end fixed
 			String param_init_stdev = cmdline.registerParameter("init_stdev", "stdev for initialization of 2-way factors; default=0.1");
 			String param_num_iter = cmdline.registerParameter("iter", "number of iterations; default=100");
 			String param_learn_rate = cmdline.registerParameter("learn_rate", "learn_rate for SGD; default=0.1");
@@ -207,19 +211,24 @@ public class Test {
                 } else {
                 	// set the regularization; for standard SGD, groups are not supported
                 	ArrayList<Double> reg = cmdline.getDblValues(param_regular);
+                	// FIXME: fixed regularization parameter input part
                 	if (reg.size() == 0) {
                 		fm.reg0 = 0.0;
                 		fm.regw = 0.0;
                 		fm.regv = 0.0;
+                		fm.regu = 0.0;
                 	} else if (reg.size() == 1) {
                 		fm.reg0 = reg.get(0);
                 		fm.regw = reg.get(0);
                 		fm.regv = reg.get(0);
+                		fm.regu = reg.get(0);
                 	} else {
                 		fm.reg0 = reg.get(0);
                 		fm.regw = reg.get(1);
                 		fm.regv = reg.get(2);
+                		fm.regu = reg.get(3);	// this one is effective, actually
                 	}
+                	// /end of fixed
                 }
                 	
                 // set the learning rates (individual per layer)
@@ -263,6 +272,8 @@ public class Test {
                 	fData.close();
                 }
                 
+			execTime = new Date().getTime() - execTime;		// time difference while executing (in ms)
+			System.out.println("execTime(ms) = " + execTime);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

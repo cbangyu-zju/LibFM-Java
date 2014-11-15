@@ -8,6 +8,8 @@ import java.util.Set;
 
 public class SparseRow {
 	
+	public final int kmeansStartId = 10057;	 // TODO: Assuming the starting featureId of kmeans cluster no is 10057
+	public int clusterId;	// The clusterId for a single user, according to featureId
 	public Map<Integer, Double> data;
 	public int size;
 	
@@ -19,6 +21,11 @@ public class SparseRow {
 	public SparseRow add(int featureId, double featureValue) {
 		this.data.put(featureId, featureValue);
 		this.size++;
+		// setting clusterId for a single user
+		if (featureId >= kmeansStartId) {
+			clusterId = featureId % kmeansStartId;
+		}
+		// /end setting
 		return this;
 	}
 	
@@ -37,5 +44,4 @@ public class SparseRow {
 		}
 		return keyList;
 	}
-
 }

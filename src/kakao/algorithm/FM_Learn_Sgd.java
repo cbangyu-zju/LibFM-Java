@@ -71,11 +71,19 @@ public class FM_Learn_Sgd extends FM_Learn {
 				fm.w.set(key, w);
 			}
 		}
+		// FIXME: added
+		if (fm.regu > 0) {
+			int currClusterId = x.clusterId;
+		}
+		// /end of added
 		for (int f = 1; f <= fm.numFactor; f++) {
 			for (int key : x.getKeySet()) {
 				double v = fm.v.get(f, key);
 				double grad = sum.get(f) * x.get(key) - v*x.get(key)*x.get(key);
-				v -= learnRate * (multiplier * grad + fm.regv*v);
+				// v -= learnRate * (multiplier * grad + fm.regv*v);
+				// FIXME: fixed SGD 
+				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu);
+				// /end of fixed
 				fm.v.set(f,key,v);
 			}
 		}

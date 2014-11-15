@@ -16,6 +16,9 @@ public class FM_Model {
 	
 	public double reg0;
 	public double regw, regv;
+   	// FIXME: added a new regularization parameter for user cluster part
+	public double regu;
+	// /end of added
 	public double initStdev;
 	public double initMean;
 	
@@ -26,6 +29,7 @@ public class FM_Model {
 		reg0 = 0.0;
 		regw = 0.0;
 		regv = 0.0;
+		regu = 0.0;
 		k0 = true;
 		k1 = true;
 	}
