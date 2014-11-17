@@ -1,1 +1,5 @@
--method sgd -learn_rate 0.1 -regular '0,0,0,0.01' -task r -train train.libsvm -test test.libsvm -out output.txt -meta meta.txt
+# normal sgd mf arguments:
+-method sgd -learn_rate 0.1 -regular '0,0,0,0' -task r -train train.libsvm -test test.libsvm -out output.txt -meta meta.txt
+
+# including cluster - sgd mf arguments:
+-method sgd -learn_rate 0.1 -regular '0,0,0,0.01' -task r -train train_cluster.libsvm -test test_cluster.libsvm -out output_cluster.txt -meta meta_cluster.txt

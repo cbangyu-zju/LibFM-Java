@@ -2,6 +2,8 @@ package kakao.algorithm;
 import kakao.data.SparseRow;
 
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 import org.la4j.matrix.dense.Basic2DMatrix;
 import org.la4j.vector.dense.BasicVector;
 

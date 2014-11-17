@@ -6,6 +6,7 @@ import kakao.algorithm.FM_Model;
 import kakao.algorithm.FM_Learn;
 import kakao.algorithm.FM_Learn_Sgd_Element;
 import kakao.util.Cmdline;
+import kakao.data.SparseRow;
 
 import org.la4j.vector.dense.BasicVector;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Iterator;
 
 
 public class Test {
@@ -128,7 +130,7 @@ public class Test {
                 }
                 
                 // TODO: (1.1.1) Load relational data
-                BasicVector relation;
+                // BasicVector relation;
 
                 // (1.2) Load meta data
                 System.out.println("Loading meta data...");
@@ -141,6 +143,17 @@ public class Test {
                 }
                 DataMetaInfo meta = metaMain;	// TODO: don't consider relation at this time
                 
+                // FIXME: (1.3) Set cluster id's
+                System.out.println("Setting clusterMap for users...");
+                final int numClusterAttrGroup = 9;	// FIXME: attribute group number for user cluster
+                int clusterAttrStartId = 0;
+                for (int i = 1; i < numClusterAttrGroup; i++) {
+                	clusterAttrStartId += meta.numAttrPerGroup.get(i);
+                }  // getting the last featureId of the last attrGroup
+                // System.out.println("clusterAttrStartId=" + (clusterAttrStartId+1));
+                trainData.setClusterIds(clusterAttrStartId+1, clusterAttrStartId + (int)meta.numAttrPerGroup.get(numClusterAttrGroup));
+                // /end Set cluster id's
+
                 // TODO: build the joined meta table
                 
 

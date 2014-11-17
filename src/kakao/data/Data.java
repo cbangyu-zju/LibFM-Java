@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 
 
 public class Data {
@@ -87,7 +89,7 @@ public class Data {
 		this.data = new CRSMatrix(numRows+1, numCols+1);
 		this.target = new BasicVector(numRows+1);
 		sparseData = new ArrayList<SparseRow>(numRows+1);
-		for (int i = 0; i <= numRows+1; i++) { sparseData.add(null); }
+		for (int i = 0; i <= numRows; i++) { sparseData.add(null); }
 
 		
 		// (2) Read the data
@@ -141,7 +143,18 @@ public class Data {
 		}
 	}
 	
-	// FIXME: added
-	
-	// /end added
+	// FIXME: added setCluster method
+	public void setClusterIds(int startId, int endId) {
+        int rowId = 0;
+       	while (rowId < this.numRows) {
+        	rowId++;
+       		for (int i = startId; i <= endId; i++) {
+       			if (this.sparseData.get(rowId).hasKey(i)) {
+       				this.sparseData.get(rowId).setClusterId(i%startId);
+       				// System.out.println("rowId=" + rowId + " , Set " + i + " as clusterId=" + i%startId);
+       			}
+        	}
+        }
+	}
+	// /end added setCluster method
 }

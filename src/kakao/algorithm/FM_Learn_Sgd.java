@@ -3,6 +3,9 @@ import kakao.data.Data;
 import kakao.data.SparseRow;
 
 import org.la4j.vector.dense.BasicVector;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 public class FM_Learn_Sgd extends FM_Learn {
 
@@ -38,8 +41,8 @@ public class FM_Learn_Sgd extends FM_Learn {
 		System.out.println("#iterations=" + numIter);
 	}
 	
-	public void SGD(SparseRow x, double multiplier, BasicVector sum) {
-		fm_SGD(learnRate,x,multiplier,sum);
+	public void SGD(SparseRow x, List<SparseRow> sparseData, double multiplier, BasicVector sum) {
+		fm_SGD(learnRate,x,sparseData,multiplier,sum);
 	}
 	
 	@Override
@@ -58,7 +61,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 	}
 	
-	public void fm_SGD(double learnRate, SparseRow x, double multiplier, BasicVector sum) {
+	public void fm_SGD(double learnRate, SparseRow x, List<SparseRow> sparseData, double multiplier, BasicVector sum) {
 		if (fm.k0) {
 			double w0 = fm.w0;
 			w0 -= learnRate * (multiplier + fm.reg0*w0);
@@ -71,19 +74,25 @@ public class FM_Learn_Sgd extends FM_Learn {
 				fm.w.set(key, w);
 			}
 		}
-		// FIXME: added
-		if (fm.regu > 0) {
-			int currClusterId = x.clusterId;
-		}
-		// /end of added
 		for (int f = 1; f <= fm.numFactor; f++) {
 			for (int key : x.getKeySet()) {
 				double v = fm.v.get(f, key);
 				double grad = sum.get(f) * x.get(key) - v*x.get(key)*x.get(key);
-				// v -= learnRate * (multiplier * grad + fm.regv*v);
+
 				// FIXME: fixed SGD 
-				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu);
+				double clusterSumV = 0.0;
+				if (fm.regu > 0) {
+					for (int i = 1; i < sparseData.size(); i++) {
+						//System.out.println("sparseData.get(" + i + ").clusterId=" + sparseData.get(i).clusterId);
+						if (sparseData.get(i).clusterId == x.clusterId) {
+							clusterSumV += (v - fm.v.get(f, i));
+						}
+					}
+				}
+				// v -= learnRate * (multiplier * grad + fm.regv*v);
+				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu*clusterSumV);
 				// /end of fixed
+
 				fm.v.set(f,key,v);
 			}
 		}
