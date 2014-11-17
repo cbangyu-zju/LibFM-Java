@@ -6,6 +6,9 @@ import org.la4j.vector.dense.BasicVector;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+
 
 public class FM_Learn_Sgd extends FM_Learn {
 
@@ -41,8 +44,8 @@ public class FM_Learn_Sgd extends FM_Learn {
 		System.out.println("#iterations=" + numIter);
 	}
 	
-	public void SGD(SparseRow x, List<SparseRow> sparseData, double multiplier, BasicVector sum) {
-		fm_SGD(learnRate,x,sparseData,multiplier,sum);
+	public void SGD(SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, BasicVector sum) {
+		fm_SGD(learnRate,x,clusterInfo,multiplier,sum);
 	}
 	
 	@Override
@@ -61,7 +64,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 	}
 	
-	public void fm_SGD(double learnRate, SparseRow x, List<SparseRow> sparseData, double multiplier, BasicVector sum) {
+	public void fm_SGD(double learnRate, SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, BasicVector sum) {
 		if (fm.k0) {
 			double w0 = fm.w0;
 			w0 -= learnRate * (multiplier + fm.reg0*w0);
@@ -82,13 +85,23 @@ public class FM_Learn_Sgd extends FM_Learn {
 				// FIXME: fixed SGD 
 				double clusterSumV = 0.0;
 				if (fm.regu > 0) {
-					for (int i = 1; i < sparseData.size(); i++) {
-						//System.out.println("sparseData.get(" + i + ").clusterId=" + sparseData.get(i).clusterId);
-						if (sparseData.get(i).clusterId == x.clusterId) {
-							clusterSumV += (v - fm.v.get(f, i));
+					for (int c : clusterInfo.keySet()) {
+						if (clusterInfo.get(c).contains(x.userId)) {
+							Iterator<Integer> it = clusterInfo.get(c).iterator();
+							while (it.hasNext()) {
+								int curr = it.next();
+								clusterSumV += (v - fm.v.get(f, curr));
+							}
+							break;
 						}
 					}
 				}
+						//System.out.println("sparseData.get(" + i + ").clusterId=" + sparseData.get(i).clusterId);
+						/*
+						if (sparseData.get(i).clusterId == x.clusterId) {
+							clusterSumV += (v - fm.v.get(f, i));
+						}
+						*/
 				// v -= learnRate * (multiplier * grad + fm.regv*v);
 				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu*clusterSumV);
 				// /end of fixed

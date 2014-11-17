@@ -21,7 +21,10 @@ public class Data {
 	
 	public CRSMatrix data;
 	public CRSMatrix data_t;
-	public List<SparseRow> sparseData;
+	// public List<SparseRow> sparseData;
+	public SparseRow[] sparseData;
+	// public List<UserInfo> userInfo;
+	public HashMap<Integer, ArrayList<Integer>> clusterInfo;
 	public BasicVector target;
 	public int numRows;	// num of rows
 	public int numCols;	 // num of columns 
@@ -32,6 +35,7 @@ public class Data {
 		this.data = null;
 		this.data_t = null;
 		this.sparseData = null;
+		this.clusterInfo = null;
 		this.cache_size = cache_size;
 		this.has_x = has_x;
 		this.has_xt = has_xt;
@@ -59,6 +63,7 @@ public class Data {
 			double currTarget;
 			while ((line = fData.readLine()) != null) {
                 numRows++;
+                System.out.println("Processing numRows=" + numRows);
 				st = new StringTokenizer(line);
 				while (st.hasMoreTokens()) {
 					curr = st.nextToken();
@@ -88,8 +93,11 @@ public class Data {
 		this.numCols = numFeature;
 		this.data = new CRSMatrix(numRows+1, numCols+1);
 		this.target = new BasicVector(numRows+1);
-		sparseData = new ArrayList<SparseRow>(numRows+1);
-		for (int i = 0; i <= numRows; i++) { sparseData.add(null); }
+		sparseData = new SparseRow[numRows+1];
+		// sparseData = new ArrayList<SparseRow>(numRows+1);
+		// for (int i = 0; i <= numRows; i++) { sparseData.add(null); }
+
+		System.out.println("numRows=" + numRows + "\tnumCols=" + numCols + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
 
 		
 		// (2) Read the data
@@ -103,8 +111,10 @@ public class Data {
 			int rowId = 0;
 			while ((line = fData.readLine()) != null) {
                 rowId++;
+                System.out.println("Processing numRows=" + rowId);
 				st = new StringTokenizer(line);
-                sparseData.set(rowId, new SparseRow());
+				sparseData[rowId] = new SparseRow();
+                // sparseData.set(rowId, new SparseRow());
 				while (st.hasMoreTokens()) {
 					curr = st.nextToken();
 					if (isDouble(curr)) {
@@ -117,7 +127,8 @@ public class Data {
 						pair = curr.split(":");
 						currFeatureId = Integer.parseInt(pair[0]);
 						currFeatureValue = Double.parseDouble(pair[1]);
-						sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
+						sparseData[rowId] = sparseData[rowId].add(currFeatureId, currFeatureValue);
+						//sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
 						data.set(rowId, currFeatureId, currFeatureValue);
 						// debug
 						// System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
@@ -134,6 +145,27 @@ public class Data {
 
 	}
 
+	public void registerUsers(int startUserId, int endUserId, int startClusterId, int endClusterId) {
+		clusterInfo = new HashMap<Integer, ArrayList<Integer>>();
+		for (int i = 1; i <= numRows; i++) {
+			for (int key : sparseData[i].data.keySet()) {
+				if (key >= startUserId && key <= endUserId && !clusterInfo.containsKey(key)) {
+					for (int j = startClusterId; j <= endClusterId; i++) {
+						if (sparseData[i].hasKey(j)) {
+							if (clusterInfo.get(j%startClusterId) == null) {
+								clusterInfo.put(j%startClusterId, new ArrayList<Integer>());
+							} else {
+								clusterInfo.get(j%startClusterId).add(key);
+							}
+							sparseData[i].registerUser(key);
+							System.out.println("Added User: userId=" + key + ", clusterId=" + (j%startClusterId));
+						}
+					}
+				}
+			}
+		}
+	}
+	
 	private boolean isDouble(String str) {
 		try {
 			Double.parseDouble(str);
@@ -142,8 +174,10 @@ public class Data {
 			return false;
 		}
 	}
+
 	
 	// FIXME: added setCluster method
+	/*
 	public void setClusterIds(int startId, int endId) {
         int rowId = 0;
        	while (rowId < this.numRows) {
@@ -156,5 +190,6 @@ public class Data {
         	}
         }
 	}
+	*/
 	// /end added setCluster method
 }

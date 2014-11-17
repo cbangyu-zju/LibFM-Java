@@ -10,12 +10,16 @@ public class SparseRow {
 	
 	public Map<Integer, Double> data;
 	public int size;
-	public int clusterId;	// clusterId for the current user
+	public int userId;
 	
 	public SparseRow() {
 		this.data = new HashMap<Integer, Double>();
 		this.size = 0;
-		this.clusterId = 0;
+		this.userId = 0;
+	}
+	
+	public void registerUser(int userId) {
+		this.userId = userId;
 	}
 	
 	public SparseRow add(int featureId, double featureValue) {
@@ -24,7 +28,6 @@ public class SparseRow {
 		return this;
 	}
 	
-	// FIXME: added methods
 	public boolean hasKey(int featureId) {
 		if (this.data.get(featureId) == null) {
 			return false;
@@ -32,11 +35,6 @@ public class SparseRow {
 			return true;
 		}
 	}
-	
-	public void setClusterId(int clusterId) {
-		this.clusterId = clusterId;
-	}
-	// /end added methods
 	
 	public double get(int featureId) {
 		return this.data.get(featureId);

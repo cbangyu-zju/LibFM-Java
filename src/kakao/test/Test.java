@@ -143,16 +143,17 @@ public class Test {
                 }
                 DataMetaInfo meta = metaMain;	// TODO: don't consider relation at this time
                 
-                // FIXME: (1.3) Set cluster id's
-                System.out.println("Setting clusterMap for users...");
+                // FIXME: (1.3) Register users from input data
+                System.out.println("Register users from input data...");
+                final int numUserAttrGroup = 1;  // FIXME: attribute group number for user id
                 final int numClusterAttrGroup = 9;	// FIXME: attribute group number for user cluster
+                int userAttrStartId = 1;
                 int clusterAttrStartId = 0;
                 for (int i = 1; i < numClusterAttrGroup; i++) {
                 	clusterAttrStartId += meta.numAttrPerGroup.get(i);
                 }  // getting the last featureId of the last attrGroup
-                // System.out.println("clusterAttrStartId=" + (clusterAttrStartId+1));
-                trainData.setClusterIds(clusterAttrStartId+1, clusterAttrStartId + (int)meta.numAttrPerGroup.get(numClusterAttrGroup));
-                // /end Set cluster id's
+                trainData.registerUsers(userAttrStartId, (int)meta.numAttrPerGroup.get(numUserAttrGroup), clusterAttrStartId+1, (int)meta.numAttrPerGroup.get(numClusterAttrGroup));
+                // /end Register users from input data
 
                 // TODO: build the joined meta table
                 

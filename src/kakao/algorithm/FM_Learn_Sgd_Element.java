@@ -38,7 +38,7 @@ public class FM_Learn_Sgd_Element extends FM_Learn_Sgd {
 		for (int i = 0; i < numIter; i++) {
 			long iterTime = new Date().getTime();
 			for (int j = 1; j <= train.numRows; j++) {
-				double p = fm.predict(train.sparseData.get(j), sum, sumSqr);
+				double p = fm.predict(train.sparseData[j], sum, sumSqr);
 				double mult = 0;
 				if (task == 0) {
 					p = Math.min(maxTarget,p);
@@ -47,7 +47,7 @@ public class FM_Learn_Sgd_Element extends FM_Learn_Sgd {
 				} else if (task == 1) {
 					mult = -train.target.get(j)*(1.0 - 1.0/(1.0+Math.exp(-train.target.get(j)*p)));
 				}
-				SGD(train.sparseData.get(j), train.sparseData, mult, sum);
+				SGD(train.sparseData[j], train.clusterInfo, mult, sum);
 			}
 			iterTime = new Date().getTime() - iterTime;		// time difference (in ms)
 			double rmse_train = evaluate(train);

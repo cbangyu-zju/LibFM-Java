@@ -21,7 +21,7 @@ public class FM_Learn {
 	public Data validation;
 
 	public double predict_case(Data data, int rowId) {
-		return fm.predict(data.sparseData.get(rowId));
+		return fm.predict(data.sparseData[rowId]);
 	}
 	
 	public FM_Learn() {
