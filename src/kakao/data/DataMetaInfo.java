@@ -1,22 +1,22 @@
 package kakao.data;
 
-import org.la4j.vector.dense.BasicVector;
+// import org.la4j.vector.dense.DenseVector;
+import no.uib.cipr.matrix.DenseVector;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 public class DataMetaInfo {
 	
-	public BasicVector attrGroup;
+	public DenseVector attrGroup;
 	public int numAttrGroups;
-	public BasicVector numAttrPerGroup;
+	public DenseVector numAttrPerGroup;
 	public int numRelations;
 	
 	public DataMetaInfo(int numAttributes) {
-		attrGroup = new BasicVector(numAttributes+1);
+		attrGroup = new DenseVector(numAttributes+1);
 		numAttrGroups = 1;
-		numAttrPerGroup = new BasicVector(numAttrGroups+1);
+		numAttrPerGroup = new DenseVector(numAttrGroups+1);
 		numAttrPerGroup.set(1, numAttributes);
 	}
 	
@@ -30,7 +30,7 @@ public class DataMetaInfo {
 				numAttrGroups = Math.max(currFeatureId, numAttrGroups);
 			}
 			fData.close();
-			numAttrPerGroup = new BasicVector(numAttrGroups+1);
+			numAttrPerGroup = new DenseVector(numAttrGroups+1);
 			fData = new BufferedReader(new FileReader(filename));
 			while ((line = fData.readLine()) != null) {
 				currFeatureId = Integer.parseInt(line);

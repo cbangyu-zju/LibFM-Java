@@ -6,15 +6,14 @@ import kakao.algorithm.FM_Model;
 import kakao.algorithm.FM_Learn;
 import kakao.algorithm.FM_Learn_Sgd_Element;
 import kakao.util.Cmdline;
-import kakao.data.SparseRow;
 
-import org.la4j.vector.dense.BasicVector;
+// import org.la4j.vector.dense.BasicVector;
+import no.uib.cipr.matrix.DenseVector;
 import java.util.ArrayList;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
 
 
 public class Test {
@@ -250,13 +249,13 @@ public class Test {
                 ArrayList<Double> lr = cmdline.getDblValues(param_learn_rate);
                 if (lr.size() == 1) {
                 	fmlsgd.learnRate = lr.get(0);
-                	fmlsgd.learnRates = new BasicVector(3);
-                	for (int i = 0; i < fmlsgd.learnRates.length(); i++) {
+                	fmlsgd.learnRates = new DenseVector(3);
+                	for (int i = 0; i < fmlsgd.learnRates.size(); i++) {
                 		fmlsgd.learnRates.set(i,lr.get(0));
                 	}
                 } else if (lr.size() == 3) {
                 	fmlsgd.learnRate = 0;
-                	fmlsgd.learnRates = new BasicVector(3);
+                	fmlsgd.learnRates = new DenseVector(3);
                 	fmlsgd.learnRates.set(0,lr.get(0));
                 	fmlsgd.learnRates.set(1,lr.get(1));
                 	fmlsgd.learnRates.set(2,lr.get(2));
@@ -274,12 +273,12 @@ public class Test {
                 
                 // () Save prediction
                 if (cmdline.hasParameter(param_out)) {
-                	BasicVector pred;
-                	pred = new BasicVector(testData.numRows+1);
+                	DenseVector pred;
+                	pred = new DenseVector(testData.numRows+1);
                 	fml.predict(testData, pred);
                 	
                 	BufferedWriter fData = new BufferedWriter(new FileWriter(cmdline.getValue(param_out)));
-                	for (int i = 1; i < pred.length(); i++) {
+                	for (int i = 1; i < pred.size(); i++) {
                 		fData.write(Double.toString(pred.get(i)));
                 		fData.newLine();
                 	}

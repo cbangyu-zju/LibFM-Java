@@ -4,12 +4,14 @@ import kakao.data.DataMetaInfo;
 
 import java.util.Date;
 
-import org.la4j.matrix.dense.Basic2DMatrix;
-import org.la4j.vector.dense.BasicVector;
+// import org.la4j.matrix.dense.Basic2DMatrix;
+import no.uib.cipr.matrix.DenseMatrix;
+// import org.la4j.vector.dense.BasicVector;
+import no.uib.cipr.matrix.DenseVector;
 
 public class FM_Learn {
-	protected BasicVector sum, sumSqr;
-	protected Basic2DMatrix pred_q_term;
+	protected DenseVector sum, sumSqr;
+	protected DenseMatrix pred_q_term;
 	public DataMetaInfo meta;
 	public FM_Model fm;
 	public double minTarget, maxTarget;
@@ -30,9 +32,9 @@ public class FM_Learn {
 	}
 	
 	public void init() {
-		sum = new BasicVector(fm.numFactor+1);
-		sumSqr = new BasicVector(fm.numFactor+1);
-		pred_q_term = new Basic2DMatrix(fm.numFactor,meta.numRelations+2);
+		sum = new DenseVector(fm.numFactor+1);
+		sumSqr = new DenseVector(fm.numFactor+1);
+		pred_q_term = new DenseMatrix(fm.numFactor,meta.numRelations+2);
 	}
 	
 	public double evaluate(Data data) {
@@ -50,7 +52,7 @@ public class FM_Learn {
 	
 	public void learn(Data train, Data test) {}
 	
-	public void predict(Data data, BasicVector out) {}
+	public void predict(Data data, DenseVector out) {}
 	
 	protected double evaluate_classification(Data data) {
 		int numCorrect = 0;

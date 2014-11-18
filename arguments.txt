@@ -3,3 +3,6 @@
 
 # including cluster - sgd mf arguments:
 -method sgd -learn_rate 0.1 -regular '0,0,0,0.01' -task r -train train_cluster.libsvm -test test_cluster.libsvm -out output_cluster.txt -meta meta_cluster.txt
+
+# analyzing actual data (10,000 rows):
+-method sgd -learn_rate 0.1 -regular '0,0,0.01,0' -task r -train ./data/em_10000_f2_m11_tr.libsvm -test ./data/em_10000_f2_m11_te.libsvm -out output_10000.txt -meta meta.txt

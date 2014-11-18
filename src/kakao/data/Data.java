@@ -1,8 +1,11 @@
 package kakao.data;
 import kakao.data.SparseRow;
 
-import org.la4j.matrix.sparse.CRSMatrix;
-import org.la4j.vector.dense.BasicVector;
+// import org.la4j.matrix.sparse.CRSMatrix;
+// import no.uib.cipr.matrix.sparse.LinkedSparseMatrix;
+import kakao.util.LinkedSparseMatrix;
+// import org.la4j.vector.dense.BasicVector;
+import no.uib.cipr.matrix.DenseVector;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,13 +22,13 @@ public class Data {
 	protected boolean has_xt;
 	protected boolean has_x;
 	
-	public CRSMatrix data;
-	public CRSMatrix data_t;
+	public LinkedSparseMatrix data;
+	public LinkedSparseMatrix data_t;
 	// public List<SparseRow> sparseData;
 	public SparseRow[] sparseData;
 	// public List<UserInfo> userInfo;
 	public HashMap<Integer, ArrayList<Integer>> clusterInfo;
-	public BasicVector target;
+	public DenseVector target;
 	public int numRows;	// num of rows
 	public int numCols;	 // num of columns 
 	public double minTarget;
@@ -91,8 +94,8 @@ public class Data {
 		}
 		
 		this.numCols = numFeature;
-		this.data = new CRSMatrix(numRows+1, numCols+1);
-		this.target = new BasicVector(numRows+1);
+		this.data = new LinkedSparseMatrix(numRows+1, numCols+1);
+		this.target = new DenseVector(numRows+1);
 		sparseData = new SparseRow[numRows+1];
 		// sparseData = new ArrayList<SparseRow>(numRows+1);
 		// for (int i = 0; i <= numRows; i++) { sparseData.add(null); }

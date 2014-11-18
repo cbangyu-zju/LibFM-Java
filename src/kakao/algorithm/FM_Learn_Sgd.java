@@ -2,12 +2,11 @@ package kakao.algorithm;
 import kakao.data.Data;
 import kakao.data.SparseRow;
 
-import org.la4j.vector.dense.BasicVector;
-import java.util.List;
+// import org.la4j.vector.dense.BasicVector;
+import no.uib.cipr.matrix.DenseVector;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
 
 
 public class FM_Learn_Sgd extends FM_Learn {
@@ -28,12 +27,12 @@ public class FM_Learn_Sgd extends FM_Learn {
 	
 	public int numIter;
 	public double learnRate;
-	public BasicVector learnRates;
+	public DenseVector learnRates;
 	
 	@Override
 	public void init() {
 		super.init();
-		learnRates = new BasicVector(3);
+		learnRates = new DenseVector(3);
 	}
 	
 	@Override
@@ -44,12 +43,12 @@ public class FM_Learn_Sgd extends FM_Learn {
 		System.out.println("#iterations=" + numIter);
 	}
 	
-	public void SGD(SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, BasicVector sum) {
+	public void SGD(SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
 		fm_SGD(learnRate,x,clusterInfo,multiplier,sum);
 	}
 	
 	@Override
-	public void predict(Data data, BasicVector out) {
+	public void predict(Data data, DenseVector out) {
 		for (int i = 1; i <= data.numRows; i++) {
 			double p = predict_case(data,i);
 			if (task == TASK_REGRESSION) {
@@ -64,7 +63,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 	}
 	
-	public void fm_SGD(double learnRate, SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, BasicVector sum) {
+	public void fm_SGD(double learnRate, SparseRow x, Map<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
 		if (fm.k0) {
 			double w0 = fm.w0;
 			w0 -= learnRate * (multiplier + fm.reg0*w0);
