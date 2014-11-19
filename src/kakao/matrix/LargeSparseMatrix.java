@@ -1,4 +1,6 @@
 package kakao.matrix;
+import kakao.data.SparseRow;
+
 import sun.misc.Cleaner;
 import sun.nio.ch.*;
 // import static org.junit.Assert.*;
@@ -10,9 +12,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
-
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutput;
 
 
 public class LargeSparseMatrix implements Closeable {

@@ -7,6 +7,9 @@ import java.io.IOException;
 
 // import java.lang.instrument.Instrumentation;
 import net.sourceforge.sizeof.*;
+import vanilla.java.collections.*;
+import vanilla.java.collections.api.HugeArrayList;
+import java.util.List;
 
 /*
 class ObjectSizeFetcher {
@@ -56,6 +59,7 @@ public class Test {
 		System.out.println(matrix.get(1,2));
 		*/
 
+		/*	Using memory-mapping via LargeSparseMatrix example
 		long start = System.nanoTime();
 		final long used0 = usedMemory();
 		LargeSparseMatrix matrix = new LargeSparseMatrix("ldm.test", 1000*100, 1000*100);
@@ -72,6 +76,80 @@ public class Test {
 		}
 		System.out.printf("Setting the diagonal took %,d ms, Heap used is %,d KB%n", time/100/100, used/1024);
 		matrix.close();
+		*/
+		
+		// create a huge array of MutableBoolean
+		/*
+		HugeArrayList<MutableTypes> hugeList = new HugeArrayBuilder<MutableTypes>() {}.create();
+		List<MutableTypes> list = hugeList;
+
+		hugeList.setSize(500*1000*1000); // increase the capacity to 500M
+
+		// give all the elements values.
+		int i = 0;
+		for (MutableTypes mb : list) {
+			SparseRow sp = new SparseRow();
+			sp.add(1,1.0);
+		    mb.setSparseRow(sp[i % sp.size]);
+		    i++;
+		}
+
+		// retrieve all the values.
+		for (MutableTypes mb : list) {
+		    boolean b1 = mb.getBoolean();
+		    Boolean b2 = mb.getBoolean2();
+		    byte b3 = mb.getByte();
+		    Byte b4 = mb.getByte2();
+		    char ch = mb.getChar();
+		    short s = mb.getShort();
+		    int i = mb.getInt();
+		    float f = mb.getFloat();
+		    long l = mb.getLong();
+		    double d = mb.getDouble();
+		    ElementType et = mb.getElementType();
+		    String text = mb.getString();
+		}
+		*/
+		
+		
 	}
 
+}
+
+interface MutableTypes {
+    public void setBoolean(boolean b);
+    public boolean getBoolean();
+
+    public void setBoolean2(Boolean b);
+    public Boolean getBoolean2();
+
+    public void setByte(byte b);
+    public byte getByte();
+
+    public void setByte2(Byte b);
+    public Byte getByte2();
+
+    public void setChar(char ch);
+    public char getChar();
+
+    public void setShort(short s);
+    public short getShort();
+
+    public void setInt(int i);
+    public int getInt();
+
+    public void setFloat(float f);
+    public float getFloat();
+
+    public void setLong(long l);
+    public long getLong();
+
+    public void setDouble(double d);
+    public double getDouble();
+
+    public void setSparseRow(SparseRow elementType);
+    public SparseRow getSparseRow();
+
+    public void setString(String text);
+    public String getString();
 }

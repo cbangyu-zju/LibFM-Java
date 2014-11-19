@@ -120,7 +120,7 @@ public class Data {
                 rowId++;
                 System.out.println("Processing numRows=" + rowId);
 				st = new StringTokenizer(line);
-				sparseData[rowId] = new SparseRow();
+				sparseData[rowId] = new SparseRow(30);
                 // sparseData.set(rowId, new SparseRow());
 				while (st.hasMoreTokens()) {
 					curr = st.nextToken();
@@ -136,8 +136,8 @@ public class Data {
 						currFeatureValue = Double.parseDouble(pair[1]);
 						sparseData[rowId] = sparseData[rowId].add(currFeatureId, currFeatureValue);
 						//sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
-						data.set(rowId, currFeatureId, currFeatureValue);
-						System.out.println(data.get(rowId, currFeatureId));
+						// data.set(rowId, currFeatureId, currFeatureValue);
+						// System.out.println(data.get(rowId, currFeatureId));
 						// debug
 						// System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
 						// /debug

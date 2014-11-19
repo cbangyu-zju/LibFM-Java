@@ -12,8 +12,8 @@ public class SparseRow {
 	public int size;
 	public int userId;
 	
-	public SparseRow() {
-		this.data = new HashMap<Integer, Double>();
+	public SparseRow(int capacity) {
+		this.data = new HashMap<Integer, Double>(capacity);
 		this.size = 0;
 		this.userId = 0;
 	}
