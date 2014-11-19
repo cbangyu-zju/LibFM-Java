@@ -1,11 +1,13 @@
 package kakao.data;
-import kakao.data.SparseRow;
 
 // import org.la4j.matrix.sparse.CRSMatrix;
 // import no.uib.cipr.matrix.sparse.LinkedSparseMatrix;
-import kakao.util.LinkedSparseMatrix;
+// import kakao.matrix.LinkedSparseMatrix;
 // import org.la4j.vector.dense.BasicVector;
+import kakao.matrix.LargeSparseMatrix;
 import no.uib.cipr.matrix.DenseVector;
+
+import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,8 +24,8 @@ public class Data {
 	protected boolean has_xt;
 	protected boolean has_x;
 	
-	public LinkedSparseMatrix data;
-	public LinkedSparseMatrix data_t;
+	public LargeSparseMatrix data;
+	public LargeSparseMatrix data_t;
 	// public List<SparseRow> sparseData;
 	public SparseRow[] sparseData;
 	// public List<UserInfo> userInfo;
@@ -33,6 +35,7 @@ public class Data {
 	public int numCols;	 // num of columns 
 	public double minTarget;
 	public double maxTarget;
+	public String filename;
 
 	public Data(int cache_size, boolean has_x, boolean has_xt) {
 		this.data = null;
@@ -55,6 +58,7 @@ public class Data {
 		System.out.println("has xt = " + has_xt);
 		int numFeature = 0;
 		int numValues = 0;
+		this.filename = filename;
 		
 		// (1) Determine the number of rows and the maximum feature_id
 		try {
@@ -94,7 +98,7 @@ public class Data {
 		}
 		
 		this.numCols = numFeature;
-		this.data = new LinkedSparseMatrix(numRows+1, numCols+1);
+		this.data = new LargeSparseMatrix(filename+".lsm", numRows+1, numCols+1);
 		this.target = new DenseVector(numRows+1);
 		sparseData = new SparseRow[numRows+1];
 		// sparseData = new ArrayList<SparseRow>(numRows+1);
@@ -133,6 +137,7 @@ public class Data {
 						sparseData[rowId] = sparseData[rowId].add(currFeatureId, currFeatureValue);
 						//sparseData.set(rowId, sparseData.get(rowId).add(currFeatureId, currFeatureValue));
 						data.set(rowId, currFeatureId, currFeatureValue);
+						System.out.println(data.get(rowId, currFeatureId));
 						// debug
 						// System.out.println("currFeatureId=" + currFeatureId + "\tcurrFeatureValue=" + currFeatureValue);
 						// /debug

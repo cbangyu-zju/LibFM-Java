@@ -1,9 +1,9 @@
 package kakao.algorithm;
 import kakao.data.Data;
 import kakao.data.SparseRow;
-
 // import org.la4j.vector.dense.BasicVector;
 import no.uib.cipr.matrix.DenseVector;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;

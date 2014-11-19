@@ -1,4 +1,4 @@
-package kakao.util;
+package kakao.matrix;
 
 import lombok.AllArgsConstructor;
 import lombok.ToString;
