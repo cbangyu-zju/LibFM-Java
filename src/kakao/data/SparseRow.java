@@ -1,19 +1,23 @@
 package kakao.data;
 
-import java.util.Map;
-import java.util.HashMap;
+// import java.util.Map;
+// import java.util.HashMap;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
 
 public class SparseRow {
 	
-	public Map<Integer, Double> data;
+	public int[] key;
+	public double[] value;
 	public int size;
 	public int userId;
 	
 	public SparseRow(int capacity) {
-		this.data = new HashMap<Integer, Double>(capacity);
+		this.key = new int[capacity];
+		this.value = new double[capacity];
 		this.size = 0;
 		this.userId = 0;
 	}
@@ -23,31 +27,42 @@ public class SparseRow {
 	}
 	
 	public SparseRow add(int featureId, double featureValue) {
-		this.data.put(featureId, featureValue);
+		this.key[size] = featureId;
+		this.value[size] = featureValue;
 		this.size++;
 		return this;
 	}
 	
 	public boolean hasKey(int featureId) {
-		if (this.data.get(featureId) == null) {
-			return false;
-		} else {
-			return true;
+		for (int k : key) {
+			if (k == featureId) {
+				return true;
+			}
 		}
+		return false;
 	}
 	
 	public double get(int featureId) {
-		return this.data.get(featureId);
+		for (int i = 0; i < size; i++) {
+			if (key[i] == featureId) {
+				return value[i];
+			}
+		}
+		return -1;
 	}
 	
 	public Set<Integer> getKeySet() {
-		return data.keySet();
+		Set<Integer> keySet = new HashSet<Integer>();
+		for (int k : key) {
+			keySet.add(k);
+		}
+		return keySet;
 	}
 	
 	public List<Integer> getKeyList() {
 		List<Integer> keyList = new ArrayList<Integer>();
-		for (int key : this.data.keySet()) {
-			keyList.add(key);
+		for (int k : key) {
+			keyList.add(k);
 		}
 		return keyList;
 	}

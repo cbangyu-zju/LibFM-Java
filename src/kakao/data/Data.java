@@ -156,7 +156,7 @@ public class Data {
 	public void registerUsers(int startUserId, int endUserId, int startClusterId, int endClusterId) {
 		clusterInfo = new HashMap<Integer, ArrayList<Integer>>();
 		for (int i = 1; i <= numRows; i++) {
-			for (int key : sparseData[i].data.keySet()) {
+			for (int key : sparseData[i].getKeySet()) {
 				if (key >= startUserId && key <= endUserId && !clusterInfo.containsKey(key)) {
 					for (int j = startClusterId; j <= endClusterId; i++) {
 						if (sparseData[i].hasKey(j)) {
