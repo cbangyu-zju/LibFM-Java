@@ -7,8 +7,6 @@ import java.io.IOException;
 
 // import java.lang.instrument.Instrumentation;
 import net.sourceforge.sizeof.*;
-import vanilla.java.collections.*;
-import vanilla.java.collections.api.HugeArrayList;
 import java.util.List;
 
 /*
