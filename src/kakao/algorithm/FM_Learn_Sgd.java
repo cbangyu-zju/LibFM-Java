@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.HashMap;
+import java.util.Date;
 
 
 public class FM_Learn_Sgd extends FM_Learn {
@@ -44,8 +45,8 @@ public class FM_Learn_Sgd extends FM_Learn {
 		System.out.println("#iterations=" + numIter);
 	}
 	
-	public void SGD(SparseRow x, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
-		fm_SGD(learnRate,x,clusterInfo,multiplier,sum);
+	public void SGD(SparseRow x, HashMap<Integer, Integer> userClusterMap, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
+		fm_SGD(learnRate,x,userClusterMap, clusterInfo,multiplier,sum);
 	}
 	
 	@Override
@@ -64,7 +65,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 	}
 	
-	public void fm_SGD(double learnRate, SparseRow x, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
+	public void fm_SGD(double learnRate, SparseRow x, HashMap<Integer, Integer> userClusterMap, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
 		if (fm.k0) {
 			double w0 = fm.w0;
 			w0 -= learnRate * (multiplier + fm.reg0*w0);
@@ -79,35 +80,35 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 		for (int f = 1; f <= fm.numFactor; f++) {
 			for (int key : x.getKeySet()) {
+				long iterTime = new Date().getTime();
 				double v = fm.v.get(f, key);
+				System.out.print(v + "\t");
 				double grad = sum.get(f) * x.get(key) - v*x.get(key)*x.get(key);
 
 				// FIXME: fixed SGD 
 				double clusterSumV = 0.0;
-				if (fm.regu > 0) {
-					for (int c = 0; c < clusterInfo.size(); c++) {
-						if (clusterInfo.get(c).contains(x.userId)) {
-							Iterator<Integer> it = clusterInfo.get(c).iterator();
-							while (it.hasNext()) {
-								int curr = it.next();
-								clusterSumV += (v - fm.v.get(f, curr));
-							}
-							break;
-						}
+				ArrayList<Integer> currCluster;
+				
+				if (fm.regu > 0 && key >= 1 && key <= 10000) {
+					currCluster = clusterInfo.get(userClusterMap.get(x.userId));
+					Iterator<Integer> it = currCluster.iterator();
+					while (it.hasNext()) {
+						int curr = it.next();
+						System.out.println(v - fm.v.get(f, curr));
+						clusterSumV += (v - fm.v.get(f, curr));
+						System.out.println(clusterSumV);
 					}
 				}
-						//System.out.println("sparseData.get(" + i + ").clusterId=" + sparseData.get(i).clusterId);
-						/*
-						if (sparseData.get(i).clusterId == x.clusterId) {
-							clusterSumV += (v - fm.v.get(f, i));
-						}
-						*/
+				
 				// v -= learnRate * (multiplier * grad + fm.regv*v);
 				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu*clusterSumV);
 				// /end of fixed
 
 				fm.v.set(f,key,v);
+				iterTime = new Date().getTime() - iterTime;		// time difference (in ms)
+				System.out.print("factor #" + f + ", key #" + key + "=" + iterTime + "\t" + v + "\n");
 			}
+			
 		}
 	}
 

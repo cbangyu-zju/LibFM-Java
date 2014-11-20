@@ -28,6 +28,7 @@ public class Data {
 	// public List<UserInfo> userInfo;
 	// public ArrayList<ArrayList<Integer>> clusterInfo;
 	public HashMap<Integer, ArrayList<Integer>> clusterInfo;
+	public HashMap<Integer, Integer> userClusterMap;
 	public DenseVector target;
 	public int numRows;	// num of rows
 	public int numCols;	 // num of columns 
@@ -96,7 +97,7 @@ public class Data {
 		}
 		
 		this.numCols = numFeature;
-		this.data = new LargeSparseMatrix(filename+".lsm", numRows+1, numCols+1);
+		// this.data = new LargeSparseMatrix(filename+".lsm", numRows+1, numCols+1);
 		this.target = new DenseVector(numRows+1);
 		sparseData = new SparseRow[numRows+1];
 		// sparseData = new ArrayList<SparseRow>(numRows+1);
@@ -156,6 +157,7 @@ public class Data {
 		final int numClusters = 11;	// FIXME: number of clusters (0..10)
 		// clusterInfo = new ArrayList<ArrayList<Integer>>(numClusters);
 		clusterInfo = new HashMap<Integer, ArrayList<Integer>>(numClusters);
+		userClusterMap = new HashMap<Integer, Integer>();
 		// for (int i = 0; i < numClusters; i++) { clusterInfo.add(null); }
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
@@ -175,6 +177,7 @@ public class Data {
             		clusterInfo.get(currClusterId).add(currUserId);
             		//System.out.println(clusterInfo.get(Integer.parseInt(curr[2])));
             	}
+            	userClusterMap.put(currUserId, currClusterId);
             	System.out.println(curr[1] + " " + curr[2]);
 			}
 			br.close();
