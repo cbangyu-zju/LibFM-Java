@@ -7,15 +7,11 @@ package kakao.data;
 import kakao.matrix.LargeSparseMatrix;
 import no.uib.cipr.matrix.DenseVector;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 
 
 public class Data {
@@ -29,7 +25,7 @@ public class Data {
 	// public List<SparseRow> sparseData;
 	public SparseRow[] sparseData;
 	// public List<UserInfo> userInfo;
-	public HashMap<Integer, ArrayList<Integer>> clusterInfo;
+	public ArrayList<ArrayList<Integer>> clusterInfo;
 	public DenseVector target;
 	public int numRows;	// num of rows
 	public int numCols;	 // num of columns 
@@ -152,7 +148,51 @@ public class Data {
 		System.out.println("numRows=" + numRows + "\tnumCols=" + numCols + "\tminTarget=" + minTarget + "\tmaxTarget=" + maxTarget);
 
 	}
+	
+	public void registerClusters(String filename) throws IOException {
+		// Put userId-clusterId info into clusterInfo Map
+		final int numClusters = 11;	// FIXME: number of clusters (0..10)
+		clusterInfo = new ArrayList<ArrayList<Integer>>(numClusters);
+		for (int i = 0; i < numClusters; i++) { clusterInfo.add(null); }
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(filename));
+			String line;
+			String[] curr;
+        	int currClusterId;
+        	int currUserId;
+			while ((line = br.readLine()) != null) {
+            	curr = line.split("\\s+");	// FIXME: fix the split delimiter
+            	currClusterId = Integer.parseInt(curr[2]);
+            	currUserId = Integer.parseInt(curr[1]);
+            	if (clusterInfo.get(currClusterId) == null) {
+            		clusterInfo.add(currClusterId, new ArrayList<Integer>());
+            		clusterInfo.get(currClusterId).add(currUserId);
+            	} else {
+            		clusterInfo.get(currClusterId).add(currUserId);
+            		//System.out.println(clusterInfo.get(Integer.parseInt(curr[2])));
+            	}
+            	System.out.println(curr[1] + " " + curr[2]);
+			}
+			br.close();
+		} catch (IOException e) {
+			System.out.println("unable to open " + filename);
+		}
+		
+	}
 
+	public void registerUsers(int startUserId, int endUserId) {
+		// Append userId for each SparseRow
+		for (int i = 1; i <= numRows; i++) {
+			for (int featureId : sparseData[i].getKeySet()) {
+				if (featureId >= startUserId && featureId <= endUserId) {
+					sparseData[i].registerUser(featureId);
+				}
+			}
+		}
+	}
+	
+	
+	/********* Old style
 	public void registerUsers(int startUserId, int endUserId, int startClusterId, int endClusterId) {
 		clusterInfo = new HashMap<Integer, ArrayList<Integer>>();
 		for (int i = 1; i <= numRows; i++) {
@@ -173,6 +213,7 @@ public class Data {
 			}
 		}
 	}
+	*/
 	
 	private boolean isDouble(String str) {
 		try {

@@ -58,6 +58,10 @@ public class LibFM {
 			
 			String param_cache_size = cmdline.registerParameter("cache_size", "cache size for data storage (only applicable if data is in binary format), default=infty");
 			
+			// FIXME: Added parameter - user_cluster
+			String param_user_cluster_file = cmdline.registerParameter("user_cluster", "filename for user cluster data");
+			
+			
 			String param_do_sampling = "do_sampling";
 			String param_do_multilevel = "do_multilevel";
 			String param_num_eval_cases = "num_eval_cases";
@@ -146,6 +150,13 @@ public class LibFM {
                 // FIXME: (1.3) Register users from input data
                 System.out.println("Register users from input data...");
                 final int numUserAttrGroup = 1;  // FIXME: attribute group number for user id
+                int userAttrStartId = 1;  // FIXME: the first user id
+                System.out.println(cmdline.getValue(param_user_cluster_file));
+                trainData.registerClusters(cmdline.getValue(param_user_cluster_file));
+                trainData.registerUsers(userAttrStartId, (int)meta.numAttrPerGroup.get(numUserAttrGroup));
+                
+                /**********	Old style
+                final int numUserAttrGroup = 1;  // FIXME: attribute group number for user id
                 final int numClusterAttrGroup = 9;	// FIXME: attribute group number for user cluster
                 int userAttrStartId = 1;
                 int clusterAttrStartId = 0;
@@ -154,6 +165,7 @@ public class LibFM {
                 }  // getting the last featureId of the last attrGroup
                 trainData.registerUsers(userAttrStartId, (int)meta.numAttrPerGroup.get(numUserAttrGroup), clusterAttrStartId+1, (int)meta.numAttrPerGroup.get(numClusterAttrGroup));
                 // /end Register users from input data
+                */
 
                 // TODO: build the joined meta table
                 

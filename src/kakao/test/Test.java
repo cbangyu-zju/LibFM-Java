@@ -1,6 +1,7 @@
 package kakao.test;
 import kakao.matrix.LargeSparseMatrix;
 import kakao.data.SparseRow;
+import kakao.data.Data;
 
 import static org.junit.Assert.*;
 import java.io.IOException;
@@ -31,6 +32,19 @@ public class Test {
 	}
 
 	public static void main(String[] args) throws IOException {
+		
+        Data trainData = new Data(0,true,false);
+        trainData.load(args[0]);
+        trainData.registerClusters(args[1]);
+        trainData.registerUsers(1, 10000);
+        
+        for (int c = 0; c < trainData.clusterInfo.size(); c++) {
+        	System.out.println(c + ": " + trainData.clusterInfo.get(c));
+        }
+		
+		
+		
+		
 		/*
 		long sample = 82L;
 		int integer = 4;

@@ -2,12 +2,13 @@ package kakao.algorithm;
 import kakao.data.Data;
 import kakao.data.DataMetaInfo;
 
-import java.util.Date;
-
 // import org.la4j.matrix.dense.Basic2DMatrix;
 import no.uib.cipr.matrix.DenseMatrix;
 // import org.la4j.vector.dense.BasicVector;
 import no.uib.cipr.matrix.DenseVector;
+
+import java.util.Date;
+
 
 public class FM_Learn {
 	protected DenseVector sum, sumSqr;
