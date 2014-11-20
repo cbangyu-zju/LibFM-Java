@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class Data {
@@ -25,7 +26,8 @@ public class Data {
 	// public List<SparseRow> sparseData;
 	public SparseRow[] sparseData;
 	// public List<UserInfo> userInfo;
-	public ArrayList<ArrayList<Integer>> clusterInfo;
+	// public ArrayList<ArrayList<Integer>> clusterInfo;
+	public HashMap<Integer, ArrayList<Integer>> clusterInfo;
 	public DenseVector target;
 	public int numRows;	// num of rows
 	public int numCols;	 // num of columns 
@@ -150,10 +152,11 @@ public class Data {
 	}
 	
 	public void registerClusters(String filename) throws IOException {
-		// Put userId-clusterId info into clusterInfo Map
+		// Put userId-clusterId info into clusterInfo ArrayList
 		final int numClusters = 11;	// FIXME: number of clusters (0..10)
-		clusterInfo = new ArrayList<ArrayList<Integer>>(numClusters);
-		for (int i = 0; i < numClusters; i++) { clusterInfo.add(null); }
+		// clusterInfo = new ArrayList<ArrayList<Integer>>(numClusters);
+		clusterInfo = new HashMap<Integer, ArrayList<Integer>>(numClusters);
+		// for (int i = 0; i < numClusters; i++) { clusterInfo.add(null); }
 		try {
 			BufferedReader br = new BufferedReader(new FileReader(filename));
 			String line;
@@ -165,7 +168,8 @@ public class Data {
             	currClusterId = Integer.parseInt(curr[2]);
             	currUserId = Integer.parseInt(curr[1]);
             	if (clusterInfo.get(currClusterId) == null) {
-            		clusterInfo.add(currClusterId, new ArrayList<Integer>());
+            		clusterInfo.put(currClusterId, new ArrayList<Integer>());
+            		// clusterInfo.set(currClusterId, new ArrayList<Integer>());
             		clusterInfo.get(currClusterId).add(currUserId);
             	} else {
             		clusterInfo.get(currClusterId).add(currUserId);

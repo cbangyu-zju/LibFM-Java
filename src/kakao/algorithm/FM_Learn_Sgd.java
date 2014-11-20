@@ -7,6 +7,7 @@ import no.uib.cipr.matrix.DenseVector;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.HashMap;
 
 
 public class FM_Learn_Sgd extends FM_Learn {
@@ -43,7 +44,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		System.out.println("#iterations=" + numIter);
 	}
 	
-	public void SGD(SparseRow x, List<ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
+	public void SGD(SparseRow x, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
 		fm_SGD(learnRate,x,clusterInfo,multiplier,sum);
 	}
 	
@@ -63,7 +64,7 @@ public class FM_Learn_Sgd extends FM_Learn {
 		}
 	}
 	
-	public void fm_SGD(double learnRate, SparseRow x, List<ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
+	public void fm_SGD(double learnRate, SparseRow x, HashMap<Integer, ArrayList<Integer>> clusterInfo, double multiplier, DenseVector sum) {
 		if (fm.k0) {
 			double w0 = fm.w0;
 			w0 -= learnRate * (multiplier + fm.reg0*w0);
