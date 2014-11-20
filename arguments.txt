@@ -5,4 +5,4 @@
 -method sgd -learn_rate 0.1 -regular '0,0,0.01,0' -task r -train ./data/em_10000_f2_m11_tr.libsvm -test ./data/em_10000_f2_m11_te.libsvm -out output_10000.txt -meta meta.txt
 
 # including cluster - sgd mf arguments:
--method sgd -learn_rate 0.1 -regular '0,0,0.01,0' -task r -train ./data/em_10000_f2_m11_tr.libsvm -test ./data/em_10000_f2_m11_te.libsvm -user_cluster ./data/user_cluster_10000.csv -out output_10000.txt -meta meta.txt
+-method sgd -learn_rate 0.1 -regular '0.1,0.1,0.005,0.1' -task r -train ./data/em_10000_f2_m11_tr.libsvm -test ./data/em_10000_f2_m11_te.libsvm -user_cluster ./data/user_cluster_10000.csv -out output_10000.txt -meta meta.txt
