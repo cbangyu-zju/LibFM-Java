@@ -69,7 +69,7 @@ public class Data {
 			double currTarget;
 			while ((line = fData.readLine()) != null) {
                 numRows++;
-                System.out.println("Processing numRows=" + numRows);
+                System.out.println("(1)Processing numRows=" + numRows);
 				st = new StringTokenizer(line);
 				while (st.hasMoreTokens()) {
 					curr = st.nextToken();
@@ -117,7 +117,7 @@ public class Data {
 			int rowId = 0;
 			while ((line = fData.readLine()) != null) {
                 rowId++;
-                System.out.println("Processing numRows=" + rowId);
+                System.out.println("(2)Processing numRows=" + rowId);
 				st = new StringTokenizer(line);
 				sparseData[rowId] = new SparseRow(30);
                 // sparseData.set(rowId, new SparseRow());

@@ -27,12 +27,20 @@ class ObjectSizeFetcher {
 
 public class Test {
 	
+	/*
 	private static long usedMemory() {
 		return Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 	}
+	*/
 
 	public static void main(String[] args) throws IOException {
 		
+		
+		
+		
+		
+		
+		/*
         Data trainData = new Data(0,true,false);
         trainData.load(args[0]);
         trainData.registerClusters(args[1]);
@@ -41,6 +49,7 @@ public class Test {
         for (int c = 0; c < trainData.clusterInfo.size(); c++) {
         	System.out.println(c + ": " + trainData.clusterInfo.get(c));
         }
+        */
 		
 		
 		
@@ -126,42 +135,4 @@ public class Test {
 		
 	}
 
-}
-
-interface MutableTypes {
-    public void setBoolean(boolean b);
-    public boolean getBoolean();
-
-    public void setBoolean2(Boolean b);
-    public Boolean getBoolean2();
-
-    public void setByte(byte b);
-    public byte getByte();
-
-    public void setByte2(Byte b);
-    public Byte getByte2();
-
-    public void setChar(char ch);
-    public char getChar();
-
-    public void setShort(short s);
-    public short getShort();
-
-    public void setInt(int i);
-    public int getInt();
-
-    public void setFloat(float f);
-    public float getFloat();
-
-    public void setLong(long l);
-    public long getLong();
-
-    public void setDouble(double d);
-    public double getDouble();
-
-    public void setSparseRow(SparseRow elementType);
-    public SparseRow getSparseRow();
-
-    public void setString(String text);
-    public String getString();
 }

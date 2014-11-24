@@ -82,31 +82,32 @@ public class FM_Learn_Sgd extends FM_Learn {
 			for (int key : x.getKeySet()) {
 				long iterTime = new Date().getTime();
 				double v = fm.v.get(f, key);
-				System.out.print(v + "\t");
+				System.out.println("factor #" + f + ", key #" + key + ", initial v=" + v);
 				double grad = sum.get(f) * x.get(key) - v*x.get(key)*x.get(key);
 
 				// FIXME: fixed SGD 
 				double clusterSumV = 0.0;
 				ArrayList<Integer> currCluster;
+				int currClusterSize = 1;
 				
 				if (fm.regu > 0 && key >= 1 && key <= 10000) {
 					currCluster = clusterInfo.get(userClusterMap.get(x.userId));
 					Iterator<Integer> it = currCluster.iterator();
 					while (it.hasNext()) {
 						int curr = it.next();
-						System.out.println(v - fm.v.get(f, curr));
 						clusterSumV += (v - fm.v.get(f, curr));
-						System.out.println(clusterSumV);
+//						System.out.println("delta=" + (v-fm.v.get(f,curr)) + ", clusterSumV=" + clusterSumV);
 					}
+					currClusterSize = currCluster.size();
 				}
 				
 				// v -= learnRate * (multiplier * grad + fm.regv*v);
-				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu*clusterSumV);
+				v -= learnRate * (multiplier * grad + fm.regv*v + fm.regu*(clusterSumV/currClusterSize));
 				// /end of fixed
 
 				fm.v.set(f,key,v);
 				iterTime = new Date().getTime() - iterTime;		// time difference (in ms)
-				System.out.print("factor #" + f + ", key #" + key + "=" + iterTime + "\t" + v + "\n");
+				System.out.println("factor #" + f + ", key #" + key + ", final v=" + v + "\t iterTime=" + iterTime);
 			}
 			
 		}
