@@ -17,3 +17,8 @@ data
 result
 train.libsvm
 test.libsvm
+
+.settings
+.project
+.DS_Store
+.classpath
