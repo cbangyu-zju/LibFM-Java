@@ -13,3 +13,7 @@ bin/
 hs_err_pid*
 
 data/
+data
+result
+train.libsvm
+test.libsvm
